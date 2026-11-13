@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; worker-src 'none'; object-src 'none'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    />
+    <meta
+      name="description"
+      content="Generate and verify TOTP (RFC 6238) codes entirely in your browser. Secrets never leave this tab."
+    />
+    <title>TOTP 2FA Generator</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Local only</p>
+        <h1>TOTP 2FA Generator</h1>
+        <p class="lede">
+          Generate a time-based one-time password in this tab, then scan the QR code with a real authenticator app (Google Authenticator, 1Password, or Aegis). The two codes should match. Nothing is sent to a server: a strict Content Security Policy sets <code>connect-src 'none'</code>, and the QR code is drawn locally as SVG.
+        </p>
+      </header>
+
+      <section class="panel" aria-labelledby="settings-heading">
+        <h2 id="settings-heading">Secret and options</h2>
+
+        <label class="field">
+          <span>Base32 secret</span>
+          <input
+            id="secret"
+            type="text"
+            spellcheck="false"
+            autocomplete="off"
+            autocapitalize="characters"
+            aria-describedby="secret-hint"
+          />
+        </label>
+        <p id="secret-hint" class="hint">A–Z and 2–7. A new 160-bit secret is generated when you open the page.</p>
+
+        <div class="samples">
+          <button type="button" id="generate" class="primary">Generate new secret</button>
+          <button type="button" id="copy-secret" class="ghost">Copy secret</button>
+        </div>
+
+        <div class="grid">
+          <label class="field">
+            <span>Issuer</span>
+            <input id="issuer" type="text" value="Example" maxlength="64" />
+          </label>
+          <label class="field">
+            <span>Account label</span>
+            <input id="account" type="text" value="demo@local" maxlength="64" />
+          </label>
+          <label class="field">
+            <span>Algorithm</span>
+            <select id="algorithm">
+              <option value="SHA-1" selected>SHA-1 (most compatible)</option>
+              <option value="SHA-256">SHA-256</option>
+              <option value="SHA-512">SHA-512</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Digits</span>
+            <select id="digits">
+              <option value="6" selected>6</option>
+              <option value="8">8</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Period (seconds)</span>
+            <input id="period" type="number" min="15" max="120" step="1" value="30" />
+          </label>
+        </div>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel code-panel" aria-labelledby="live-heading">
+        <h2 id="live-heading">Live code</h2>
+        <p id="code" class="code" aria-live="polite">------</p>
+        <div class="timer-row">
+          <div class="bar" aria-hidden="true"><span id="bar-fill"></span></div>
+          <p id="countdown" class="countdown">—</p>
+        </div>
+        <div class="samples">
+          <button type="button" id="copy-code" class="ghost">Copy code</button>
+        </div>
+      </section>
+
+      <section class="split">
+        <section class="panel" aria-labelledby="qr-heading">
+          <h2 id="qr-heading">Scan with an authenticator</h2>
+          <div id="qr" class="qr" aria-hidden="true"></div>
+          <label class="field">
+            <span>otpauth URI</span>
+            <textarea id="uri" rows="3" readonly spellcheck="false"></textarea>
+          </label>
+          <button type="button" id="copy-uri" class="ghost">Copy URI</button>
+        </section>
+
+        <section class="panel" aria-labelledby="verify-heading">
+          <h2 id="verify-heading">Verify a code</h2>
+          <p class="hint">Checks the current time step and the immediate neighbours (±1 period), which is how most authenticator apps tolerate a small clock skew.</p>
+          <label class="field">
+            <span>Code to check</span>
+            <input id="verify-input" type="text" inputmode="numeric" autocomplete="one-time-code" spellcheck="false" />
+          </label>
+          <button type="button" id="verify" class="primary">Verify code</button>
+          <p id="verify-result" class="status" role="status" aria-live="polite"></p>
+        </section>
+      </section>
+
+      <details class="panel hood">
+        <summary>Under the hood</summary>
+        <dl class="rows">
+          <div class="row"><dt>Unix time (UTC)</dt><dd id="hood-unix">—</dd></div>
+          <div class="row"><dt>Counter (floor(unix / period))</dt><dd id="hood-counter">—</dd></div>
+          <div class="row"><dt>HMAC (hex)</dt><dd id="hood-hmac">—</dd></div>
+          <div class="row"><dt>Offset (last nibble)</dt><dd id="hood-offset">—</dd></div>
+          <div class="row"><dt>Dynamic truncation (4 bytes)</dt><dd id="hood-bytes">—</dd></div>
+        </dl>
+      </details>
+
+      <section class="limits" aria-labelledby="limits-heading">
+        <h2 id="limits-heading">Security notes</h2>
+        <ul>
+          <li>This is an educational, local tool. Everything stays in this browser tab.</li>
+          <li>Do not paste a production account secret into a shared or untrusted computer.</li>
+          <li>SHA-1 is the default because it is what most authenticator apps still expect. SHA-256 and SHA-512 are available, but not every app will honour them.</li>
+          <li>The live QR is generated in this page from the <code>otpauth://</code> URI. No third-party QR API is used.</li>
+        </ul>
+      </section>
+
+      <footer class="foot">
+        <p>
+          Open source on
+          <a href="https://github.com/ottonielmorais2008-rgb/totp-2fa-generator">GitHub</a>.
+          Secrets never leave this tab.
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,117 @@
+:root {
+  color-scheme: dark;
+  --bg: #10141c;
+  --panel: #1a2130;
+  --panel-2: #232c3e;
+  --ink: #e8eef8;
+  --muted: #9aa8bd;
+  --line: #33405a;
+  --accent: #7dd3c7;
+  --accent-ink: #06211d;
+  --warn: #f4c56d;
+  --error: #ff8f8f;
+  --ok: #8ee0b0;
+  --ok-bg: #143325;
+  --error-bg: #3a1518;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { min-height: 100vh; }
+.shell { max-width: 52rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.hero h1 { margin: 0.2rem 0 0.6rem; font-size: 1.9rem; letter-spacing: -0.03em; }
+.eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; color: var(--accent); margin: 0; }
+.lede, .hint, .foot, .countdown { color: var(--muted); line-height: 1.55; }
+.lede { margin-top: 0; }
+.hint { margin: 0.35rem 0 0.8rem; font-size: 0.92rem; }
+
+.panel, .hood {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  margin: 1rem 0;
+}
+
+h2 { margin: 0 0 0.85rem; font-size: 1.05rem; }
+.field { display: flex; flex-direction: column; gap: 0.35rem; margin: 0.7rem 0; font-size: 0.92rem; color: var(--muted); }
+.field input, .field select, .field textarea {
+  font: inherit;
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  width: 100%;
+}
+.field textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.8rem; }
+.samples { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.4rem 0 0.2rem; }
+
+button {
+  font: inherit;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink);
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+button.ghost { background: transparent; }
+
+.status { min-height: 1.4rem; margin: 0.6rem 0 0; }
+.status[data-kind="error"] { color: var(--error); }
+.status[data-kind="ok"] { color: var(--ok); }
+
+.code-panel { text-align: center; }
+.code {
+  margin: 0.2rem 0 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(2.2rem, 8vw, 3.4rem);
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+.timer-row { display: grid; gap: 0.45rem; justify-items: center; }
+.bar {
+  width: min(22rem, 100%);
+  height: 0.45rem;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar span { display: block; height: 100%; width: 0%; background: var(--accent); border-radius: inherit; }
+.countdown { margin: 0; font-variant-numeric: tabular-nums; }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.split .panel { margin: 0; }
+.qr {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 12rem;
+  background: #0b0f16;
+  border-radius: 12px;
+  padding: 0.8rem;
+}
+.qr svg { width: min(240px, 100%); height: auto; border-radius: 8px; }
+
+.rows { margin: 0.6rem 0 0; }
+.row { display: grid; grid-template-columns: 13rem 1fr; gap: 0.6rem; padding: 0.4rem 0; border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: 0; }
+.row dt { color: var(--muted); font-weight: 600; }
+.row dd { margin: 0; overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88rem; }
+
+.hood summary { cursor: pointer; font-weight: 650; }
+.limits { margin-top: 1.2rem; }
+.limits ul { color: var(--muted); line-height: 1.55; padding-left: 1.1rem; }
+.foot { margin-top: 2rem; font-size: 0.92rem; }
+.foot a { color: var(--accent); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+
+@media (max-width: 720px) {
+  .grid, .split, .row { grid-template-columns: 1fr; }
+}
